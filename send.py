@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
 
 cfg = json.load(file('./config.json'))
 api_key = cfg['api_key']
-regId = cfg['regId']
+regId = cfg['reg_id']
 
 data = {
     'registration_ids': [regId],
