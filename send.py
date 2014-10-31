@@ -1,13 +1,19 @@
 import urllib2
 import json 
+import sys
 
-api_key = raw_input('API Key:')
-regId = raw_input('Reg Id:')
+if len(sys.argv) < 2: 
+    print 'Usage: python send.py [msg]'
+    sys.exit()
+
+cfg = json.load(file('./config.json'))
+api_key = cfg['api_key']
+regId = cfg['regId']
 
 data = {
     'registration_ids': [regId],
     'data': {
-        'msg': 'Hello world!'
+        'msg': sys.argv[1]
     }
 }
 
