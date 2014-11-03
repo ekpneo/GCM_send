@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <title>send.py</title>
+    <script>
+
+      function get_reg_ids() {
+        var elements = document.getElementsByName('checkbox');
+        reg_ids = []
+        for(var i in elements) {
+          if(typeof(elements[i]) == 'object') 
+            if(reg_ids.indexOf(elements[i].id) == -1)
+              reg_ids.push(elements[i].id);
+        }
+        return reg_ids;
+      }
+
+      function clickall(oo) {
+        var elements = document.getElementsByName('checkbox');
+        for(var o in elements){
+          if(typeof(elements[o]) == 'object'){
+            elements[o].checked = oo.checked;
+          }
+        }
+      }
+      function send() {
+        var reg_ids = get_reg_ids();
+        var icon = document.getElementById('icon').value;
+        var msg = escape(document.getElementById('msg').value);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                alert('Sent!');
+            }
+        }
+        xhr.open('GET', '/send?icon=' + icon + '&reg_ids=' + reg_ids.join(',')  + '&msg=' + msg, true);
+        xhr.send(null);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>send.py</h1>
+    <hr />
+    <h2>1. Select registration IDs<h2>
+    <h3>Please select the recipents to send<h3>
+    <table style="width: 100%">
+      <thead>
+        <tr>
+          <td style="width: 45px;"><input type="checkbox" onchange="clickall(this);" /> #</td>
+          <td>Reg ID</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reg_ids %}
+        <tr>
+          <td>
+            <input type="checkbox" name="checkbox" id="{{r}}" /> {{ loop.index }}        
+          </td>
+          <td>
+            {{ r }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h2>2. Fill the form below</h2>
+    <h3>Notification will be displayed to recipents based on what you write down below</h3>
+    <table style="width: 100%">
+      <tr>
+        <td style="width: 45px;">Icon</td>
+        <td>
+          <select id="icon">
+            <option value="1">Plane</option>
+            <option value="2">Exclamation Mark</option>
+            <option value="3">Question Mark</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <textarea id="msg" style="width: 100%; height: 100px;"></textarea>
+        </td>
+    </table> 
+    <h2>3. Send the notification</h2>
+    <h3>Please click on the button below</h3>
+    <input type="button" onclick="send();" value="Send!" /> 
+  </body>
+</html>
