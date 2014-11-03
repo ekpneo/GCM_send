@@ -14,6 +14,7 @@ def save_config():
     json.dump(_cfg, file('./config.json', 'w'))
 
 def send(reg_ids, icon, msg):
+    print 'To:', reg_ids
     data = {
         'registration_ids': reg_ids,
         'data': {
@@ -35,18 +36,19 @@ def web_send():
     reg_ids = request.args.get('reg_ids').split(',')
     icon = request.args.get('icon')
     msg = request.args.get('msg')
-    send(reg_ids, icon, msg)
+    print send(reg_ids, icon, msg)
     return redirect('/')
 
 @app.route('/add_reg_id')
 def add_reg_id():
     reg_id = request.args.get('reg_id')
     if len(reg_id):
-        _reg_ids.append(reg_id)
-        save_config()
+        if reg_id not in _reg_ids:
+            _reg_ids.append(reg_id)
+            save_config()
     return 'ok'
 
 
 if __name__ == '__main__':
     print 'Go to http://localhost:5000/ to send notifications.'
-    app.run(port=5000)
+    app.run(host="0.0.0.0", port=5000)

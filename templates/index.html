@@ -9,8 +9,9 @@
         reg_ids = []
         for(var i in elements) {
           if(typeof(elements[i]) == 'object') 
-            if(reg_ids.indexOf(elements[i].id) == -1)
-              reg_ids.push(elements[i].id);
+            if(elements[i].checked)
+              if(reg_ids.indexOf(elements[i].id) == -1)
+                reg_ids.push(elements[i].id);
         }
         return reg_ids;
       }
