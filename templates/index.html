@@ -28,13 +28,25 @@
         var reg_ids = get_reg_ids();
         var icon = document.getElementById('icon').value;
         var msg = escape(document.getElementById('msg').value);
+		var title = escape(document.getElementById('title').value);
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 alert('Sent!');
             }
         }
-        xhr.open('GET', '/send?icon=' + icon + '&reg_ids=' + reg_ids.join(',')  + '&msg=' + msg, true);
+        xhr.open('GET', '/send?icon=' + icon + '&reg_ids=' + reg_ids.join(',')  + '&title=' + title + '&msg=' + msg, true);
+        xhr.send(null);
+      }
+      function send_cancel() {
+        var reg_ids = get_reg_ids();
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                alert('Cancelled');
+            }
+        }
+        xhr.open('GET', '/cancel?reg_ids=' + reg_ids.join(','), true);
         xhr.send(null);
       }
     </script>
@@ -71,12 +83,18 @@
         <td style="width: 45px;">Icon</td>
         <td>
           <select id="icon">
-            <option value="kakao">Kakao Talk (chat)</option>
+            <option value="chat">Chat</option>
             <option value="email">Email</option>
             <option value="3">Question Mark</option>
           </select>
         </td>
       </tr>
+	  <tr>
+		<td style="width: 45px;">Title</td>
+		<td>
+			<input type="text" name="title" id="title">
+		</td>
+	  </tr>
       <tr>
         <td colspan="2">
           <textarea id="msg" style="width: 100%; height: 100px;"></textarea>
@@ -85,5 +103,6 @@
     <h2>3. Send the notification</h2>
     <h3>Please click on the button below</h3>
     <input type="button" onclick="send();" value="Send!" /> 
+	<input type="button" onclick="send_cancel();" value="Cancel" />
   </body>
 </html>

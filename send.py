@@ -13,15 +13,26 @@ def save_config():
     _cfg['reg_ids'] = _reg_ids
     json.dump(_cfg, file('./config.json', 'w'))
 
-def send(reg_ids, icon, msg):
+def send_cancel(reg_ids):
+    data = { 
+        'registration_ids': reg_ids,
+        'data': {
+            'type': 'cancel'
+        }}
+    request = urllib2.Request('https://android.googleapis.com/gcm/send', data=json.dumps(data), headers={'Authorization': 'key='+api_key, 'Content-Type': 'application/json'})
+    return urllib2.urlopen(request).read()
+
+def send(reg_ids, icon, title, msg):
     print 'To:', reg_ids
     data = {
         'registration_ids': reg_ids,
         'data': {
+            'title': title,
             'icon': icon,
             'msg': msg
         }
     }
+    print json.dumps(data)
     request = urllib2.Request('https://android.googleapis.com/gcm/send', data=json.dumps(data), headers={'Authorization': 'key='+api_key, 'Content-Type': 'application/json'})
     return urllib2.urlopen(request).read()
 
@@ -35,8 +46,15 @@ def index():
 def web_send():
     reg_ids = request.args.get('reg_ids').split(',')
     icon = request.args.get('icon')
+    title = request.args.get('title')
     msg = request.args.get('msg')
-    print send(reg_ids, icon, msg)
+    print send(reg_ids, icon, title, msg)
+    return redirect('/')
+
+@app.route('/cancel')
+def web_cancel():
+    reg_ids = request.args.get('reg_ids').split(',')
+    print send_cancel(reg_ids)
     return redirect('/')
 
 @app.route('/add_reg_id')
