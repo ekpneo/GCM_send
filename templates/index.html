@@ -49,6 +49,32 @@
         xhr.open('GET', '/cancel?reg_ids=' + reg_ids.join(','), true);
         xhr.send(null);
       }
+
+
+      function send_mosquitto() {
+        var icon = document.getElementById('icon').value;
+        var msg = escape(document.getElementById('msg').value);
+		var title = escape(document.getElementById('title').value);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                alert('Sent!');
+            }
+        }
+        xhr.open('GET', '/mosq_send?icon=' + icon + '&title=' + title + '&msg=' + msg, true);
+        xhr.send(null);
+      }
+
+      function cancel_mosquitto() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                alert('Cancelled!');
+            }
+        }
+        xhr.open('GET', '/mosq_cancel', true);
+        xhr.send(null);
+      }
     </script>
   </head>
   <body>
@@ -103,6 +129,9 @@
     <h2>3. Send the notification</h2>
     <h3>Please click on the button below</h3>
     <input type="button" onclick="send();" value="Send!" /> 
-	<input type="button" onclick="send_cancel();" value="Cancel" />
+	<input type="button" onclick="send_cancel();" value="Cancel" /><br>
+
+	<input type="button" onclick="send_mosquitto();" value="Send Mosquitto" />
+	<input type="button" onclick="cancel_mosquitto();" value="Cancel Mosquitto" />
   </body>
 </html>

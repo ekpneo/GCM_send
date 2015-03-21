@@ -1,6 +1,8 @@
 import urllib2
 import json 
 import sys
+import time
+import subprocess
 from flask import Flask, request, render_template, redirect
 
 # Load the config file.
@@ -36,6 +38,39 @@ def send(reg_ids, icon, title, msg):
     request = urllib2.Request('https://android.googleapis.com/gcm/send', data=json.dumps(data), headers={'Authorization': 'key='+api_key, 'Content-Type': 'application/json'})
     return urllib2.urlopen(request).read()
 
+msg_id = 1
+topic = '/user/Wv5mtEpARNq16ZasKDIFqA'
+
+def send_mosquitto(icon, title, msg):
+    global msg_id
+    data = {
+	    'id': 'msg' + str(msg_id),
+        'from': 'C2I_cMf-S8O2LrUVKOWgzA',
+        't':'msg',
+        'd': {
+            'title': title,
+            'text': msg,
+            'icon': icon,
+        }
+    }
+    subprocess.call(['mosquitto_pub', 
+        '-t', topic, 
+        '-m', json.dumps(data),
+        '-q', '1' ])
+    msg_id += 1
+    
+def cancel_mosquitto():
+    data = {
+        'id': 'cancel' + str(msg_id - 1),
+        'from': 'C2I_cMf-S8O2LrUVKOWgzA',
+        't': 'cancel',
+        'd': { 'id': 'msg' + str(msg_id - 1) }
+    }
+    subprocess.call(['mosquitto_pub', 
+        '-t', topic, 
+        '-m', json.dumps(data),
+        '-q', '1' ])
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -49,13 +84,26 @@ def web_send():
     title = request.args.get('title')
     msg = request.args.get('msg')
     print send(reg_ids, icon, title, msg)
-    return redirect('/')
+    return 'ok'
 
 @app.route('/cancel')
 def web_cancel():
     reg_ids = request.args.get('reg_ids').split(',')
     print send_cancel(reg_ids)
-    return redirect('/')
+    return 'ok'
+
+@app.route('/mosq_send')
+def web_mosq_send():
+    icon = request.args.get('icon')
+    title = request.args.get('title')
+    msg = request.args.get('msg')
+    send_mosquitto(icon, title, msg)
+    return 'ok'
+
+@app.route('/mosq_cancel')
+def web_mosq_cancel():
+    cancel_mosquitto()
+    return 'ok'
 
 @app.route('/add_reg_id')
 def add_reg_id():
@@ -65,7 +113,6 @@ def add_reg_id():
             _reg_ids.append(reg_id)
             save_config()
     return 'ok'
-
 
 if __name__ == '__main__':
     print 'Go to http://localhost:5000/ to send notifications.'
